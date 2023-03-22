@@ -16,6 +16,10 @@ The full code and data are available in this respository.
 ## Content
 
 `data/`: Train Dataset + Test Dataset
+Each dataset containing : 
+`input_tiles/` : tiles used for the input
+`output_matrix/` : matrix containing the polygons used as a label
+`tci_tiles/` : true color tiles
 
  
 ## How to Use
