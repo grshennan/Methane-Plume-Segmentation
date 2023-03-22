@@ -12,7 +12,7 @@ class PlumeSegmentationDataset():
         """
         :param datadir: data directory
         :param segdir: label directory
-        :param band: bands of the Sentinel-2 images to get
+        :param band: bands of the Sentinel-2 images to work with. A list of integer between 1 and 13 is expected corresponding to [B1,B2,B3,B4,B5,B6,B7,B8,B8a,B9,B10,B11,B12]
         :param transform: transformations to apply
         """
         
@@ -75,7 +75,7 @@ class PlumeSegmentationDataset():
 
 
 class Crop(object):
-    """Crop 90x90 pixel image (from 120x120)."""
+    """Crop 90x90 pixel image in case the dimensions are wrong"""
 
     def __call__(self, sample):
         """
@@ -163,7 +163,7 @@ class ToTensor(object):
 
 def create_dataset(*args, apply_transforms=True, **kwargs):
     """Create a dataset;
-    :param apply_transforms: if `True`, apply available transformations
+    :param apply_transforms: if `True`, apply Randomize transformations
     :return: data set"""
     if apply_transforms:
         data_transforms = transforms.Compose([
