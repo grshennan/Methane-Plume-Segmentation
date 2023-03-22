@@ -1,6 +1,8 @@
 # Methane-Plume-Segmentation
 
-This repository contains the code base for our work intituled *Methane plume detection with U-Net segmentation on Sentinel-2 image data*
+This repository contains the code base for our work entitled *Methane plume detection with U-Net segmentation on Sentinel-2 image data*
+
+It is based on the work of Mommert, M., Sigel, M., Neuhausler, M., Scheibenreif, L., Borth, D., "Characterization of Industrial Smoke Plumes from Remote Sensing Data" Tackling Climate Change with Machine Learning Workshop, NeurIPS 2020.
 
  
 ## About this Project
