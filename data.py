@@ -9,6 +9,12 @@ class PlumeSegmentationDataset():
     """SmokePlumeSegmentation dataset class."""
 
     def __init__(self, datadir=None, segdir=None, band=[1,2,3,4,5,6,7,8,9,10,11,12,13], transform=None):
+        """
+        :param datadir: data directory
+        :param segdir: label directory
+        :param band: bands of the Sentinel-2 images to get
+        :param transform: transformations to apply
+        """
         
         self.datadir = datadir
         self.transform = transform
@@ -43,17 +49,17 @@ class PlumeSegmentationDataset():
 
     def __getitem__(self, idx):
         """Read in image data, preprocess, build segmentation mask, and apply
-        transformations."""
+        transformations;
+        :param idx: idx of the item to get
+        :return: sample ready to use
+        """
 
         # read in image data
         imgfile = rio.open(self.imgfiles[idx], nodata = 0)
         imgdata = np.array([imgfile.read(i) for i in self.band])
-        # skip band 11 (Sentinel-2 Band 10, Cirrus) as it does not contain
-        # useful information in the case of Level-2A data products
 
         fptdata = np.loadtxt(self.segfiles[idx], delimiter=",", dtype=float)
         fptdata = np.array(fptdata)
-        # fptdata.reshape(fptdata,(120,120))
 
         sample = {'idx': idx,
                   'band' : self.band,
@@ -69,12 +75,12 @@ class PlumeSegmentationDataset():
 
 
 class Crop(object):
-    """Crop 90x90 pixel image (from 120x120). - TEST FUNCTION"""
+    """Crop 90x90 pixel image (from 120x120)."""
 
     def __call__(self, sample):
         """
         :param sample: sample to be cropped
-        :return: randomized sample
+        :return: cropped sample
         """
         imgdata = sample['img']
 
@@ -123,9 +129,7 @@ class Normalize(object):
     """Normalize pixel values to zero mean and range [-1, +1] measured in
     standard deviations."""
     def __init__(self):
-        """
-        :param size: edge length of quadratic output size
-        """
+        
         self.channel_means = np.array([1909.3802, 1900.5879, 2261.5823, 3164.3564, 3298.6106, 3527.9346, 3791.7458, 3604.5210, 3946.0535, 1223.0176, 27.1881, 4699.9775, 3989.9626])
         self.channel_stds = np.array([ 498.8658,  507.0728,  573.1718,  965.0130, 1014.2232, 1069.5269, 1133.6522, 1073.3431, 1146.3250,  520.9219,   28.9335, 1360.9994, 1169.5753])
     
@@ -158,7 +162,7 @@ class ToTensor(object):
         return out
 
 def create_dataset(*args, apply_transforms=True, **kwargs):
-    """Create a dataset; uses same input parameters as PowerPlantDataset.
+    """Create a dataset;
     :param apply_transforms: if `True`, apply available transformations
     :return: data set"""
     if apply_transforms:
