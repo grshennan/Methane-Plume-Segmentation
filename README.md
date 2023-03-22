@@ -38,3 +38,10 @@ data.
 The model can be trained by invoking:
 
     python train.py
+    
+with the following optional parameters:
+    
+* `-bs <int>` to define a batch size,
+* `-ep <int>` to define the number of training epochs,
+* `-lr <float>` to define a starting learning rate, and
+* `-mo <float>` to define a momentum value.
