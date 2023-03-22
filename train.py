@@ -15,6 +15,7 @@ from model_unet import *
 from data import create_dataset
 
 
+#Identification of the training
 t = time.localtime()
 crt_time = time.strftime("%H:%M:%S", t)
 idd = random.randint(0, 100)
@@ -24,13 +25,17 @@ print(f"{crt_time}, {idd}")
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(device)
 
-def set_all_seeds(seed):
-  random.seed(seed)
-  np.random.seed(seed)
-  torch.manual_seed(seed)
-  torch.cuda.manual_seed(seed)
-  torch.backends.cudnn.deterministic = True
 
+
+def set_all_seeds(seed):
+    """Set all the seeds to fix the same initial conditions for each training;
+    :param seed: seed
+    """
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
 
 
 def train_model(model, epochs, opt, loss, batch_size):
@@ -41,13 +46,12 @@ def train_model(model, epochs, opt, loss, batch_size):
     :param loss: loss function instance
     :param batch_size: (int) batch size"""
     
-    # create dataset
+    # create the datasets
     PATH_D_TRAIN=os.getcwd() + "/data/DataTrain/input_tiles/"
     PATH_S_TRAIN=os.getcwd()+"/data/DataTrain/output_matrix/"
     PATH_D_TEST=os.getcwd()+"/data/DataTest/input_tiles/"
     PATH_S_TEST=os.getcwd()+"/data/DataTest/output_matrix/"
 
-    
     data_train = create_dataset(
         datadir=PATH_D_TRAIN,
         segdir=PATH_S_TRAIN,
@@ -72,31 +76,22 @@ def train_model(model, epochs, opt, loss, batch_size):
     val_dl = DataLoader(data_val, batch_size=batch_size,
                          pin_memory=True, sampler=val_sampler)
 
-    
-
-
 
     # start training process
     for epoch in range(epochs):
 
         model.train()
-
-        
         train_loss_total = 0
         train_ious = []
         train_acc_total = 0
         train_area = []
 
-       
         for i, batch in enumerate(train_dl):
             x = batch['img'].float().to(device)
             y = batch['fpt'].float().to(device)
 
             output = model(x)
 
-            
-
-           
             #derive segmentation map from prediction
             output_bin = torch.round(torch.sigmoid(output))
 
@@ -108,7 +103,6 @@ def train_model(model, epochs, opt, loss, batch_size):
             # derive image-wise accuracy for this batch
             acc = Accuracy(task = 'binary').to(device)
             a = acc(output_bin, y[:,None,:,:])
-            
             train_acc_total += a
 
             # derive loss
@@ -119,7 +113,7 @@ def train_model(model, epochs, opt, loss, batch_size):
             area_pred = torch.sum(output_bin, dim = (1, 2, 3))
             area_true = torch.sum(y.unsqueeze(dim=1), dim=(1,2,3))
 
-            #Derive area accuracy
+            #derive area accuracy
             area_dif = torch.sum(torch.square(torch.sub(area_pred, area_true))).cpu()
             train_area.append(area_dif.detach().numpy())
 
@@ -138,7 +132,7 @@ def train_model(model, epochs, opt, loss, batch_size):
 
             torch.cuda.empty_cache()
 
-        # evaluation 
+        # start evaluation process 
         with torch.no_grad():
             val_loss_total = 0
             val_ious = []
@@ -166,20 +160,16 @@ def train_model(model, epochs, opt, loss, batch_size):
                 # derive image-wise accuracy for this batch
                 acc = Accuracy(task = 'binary').to(device)
                 a = acc(output_bin, y[:,None,:,:])
-
                 val_acc_total += a
 
                 # derive smoke areas
                 area_pred = torch.sum(output_bin, dim = (1, 2, 3))
                 area_true = torch.sum(y.unsqueeze(dim=1), dim=(1,2,3))
 
-                #Derive area accuracy
+                #derive area accuracy
                 area_dif = torch.sum(torch.square(torch.sub(area_pred, area_true))).cpu()
                 val_area.append(area_dif.detach().numpy())
               
-             
-
-
                 # logging
                 writer.add_scalar("Test/Loss", val_loss_total/(j+1), epoch)
                 writer.add_scalar("Test/Iou", np.average(val_ious), epoch)
@@ -189,21 +179,18 @@ def train_model(model, epochs, opt, loss, batch_size):
                 writer.add_scalar('Test/Arearatio std',
                                np.std(val_area), epoch)
 
+            #print the metrucs after each epoch
             print(("Epoch {:d}: train loss={:.3f}, val loss={:.3f}, " "train iou={:.3f}," "train acc={:.3f},").format(epoch+1, train_loss_total/(i+1), val_loss_total/(j+1), np.average(train_ious),train_acc_total/(i+1)))
             
             writer.flush()
 
-            
+            #save the model each 50 epochs
             if epoch%50 == 0:
                 PATH_MOD=os.getcwd()+"/mod/"
                 torch.save(model.state_dict(), PATH_MOD+f"ep{epoch}_lr{lr}_bs{bs}_time{crt_time}_idd{idd}.model")
 
 
     return model
-
-
-
-
 
 
 
@@ -221,21 +208,15 @@ if __name__ == '__main__':
                     nargs='?', default=0.01, help='Learning rate')
     args = parser.parse_args()
 
-
-    #Seed
+    # set seed
     set_all_seeds(21)
     
-    
-    #Path du Working Directory modifier "../../../tmpdir/{USERNAME}"
-    #PATH_WD = "../../../tmpdir/guiglion"
-    #os.chdir(PATH_WD)
-    
-    #Model
+    # model
     bands = [1,2,3,4,5,6,7,8,9,10,11,12,13]
     model = UNet(n_channels=13, n_classes=1)
     model.to(device)
     
-    #Trainning parameters
+    # trainning parameters
     ep = args.ep 
     lr = args.lr
     bs = args.bs
@@ -249,7 +230,8 @@ if __name__ == '__main__':
     
     # initialize optimizer
     opt = optim.Adam(model.parameters(),lr=lr)
-   
+    
+    # create the directory to save the models
     PATH_MOD=os.getcwd()+"/mod/"
     if not os.path.exists(PATH_MOD):
         os.mkdir(PATH_MOD)
@@ -260,6 +242,5 @@ if __name__ == '__main__':
     # save final trained model
     torch.save(trained_model.state_dict(),
     PATH_MOD+f"ep{ep}_lr{lr}_bs{bs}_time{crt_time}_idd{idd}.model")    
-    
     
     writer.close()
