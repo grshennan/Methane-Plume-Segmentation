@@ -4,7 +4,7 @@ This repository contains the code base for our work titled *Methane plume detect
 
 It is based on the work of Mommert, M., Sigel, M., Neuhausler, M., Scheibenreif, L., Borth, D., *"Characterization of Industrial Smoke Plumes from Remote Sensing Data"* Tackling Climate Change with Machine Learning Workshop, NeurIPS 2020.
 
- 
+
 ## About this Project
 
 Methane ($CH_4$) emissions have a significant impact on increasing global warming. To help track methane leaks and uncontrolled emissions, we looked into an open source way to detect methane plumes on Sentinel-2 satellite images.
@@ -14,6 +14,15 @@ We built a train dataset of approximatly 5000 pictures and a test dataset of 200
 Despite numerous attempts to prevent overfitting using various regularization and data augmentation methods, the performances on the test dataset did not improve. This leads us to think that the poor generalization capacity of our model comes from the size and variety of our dataset.
 
 The full code and data are available in this respository.
+
+### Illustration of the model output on the training dataset:
+
+ ![train](https://user-images.githubusercontent.com/81817015/226879252-e6ac23ce-eae5-477b-b212-ccde0bb5f6a4.svg)
+ 
+### Illustration of the model output on the test dataset:
+ 
+ ![test](https://user-images.githubusercontent.com/81817015/226879978-7b418813-c077-467e-add4-69da738d9153.svg)
+
 
 ## Content
 
@@ -43,5 +52,4 @@ with the following optional parameters:
     
 * `-bs <int>` to define a batch size,
 * `-ep <int>` to define the number of training epochs,
-* `-lr <float>` to define a starting learning rate, and
-* `-mo <float>` to define a momentum value.
+* `-lr <float>` to define a starting learning rate
