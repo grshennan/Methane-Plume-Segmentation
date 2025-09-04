@@ -1,3 +1,7 @@
+# Note
+
+This is a fork of ![sfinos316/Methane-Plume-Segmentation](https://github.com/sfinos316/Methane-Plume-Segmentation), made only remote : characters from file names, allowing cloning to a Windows machine.
+
 # Methane-Plume-Segmentation
 
 This repository contains the code base for our work titled *Methane plume detection with U-Net segmentation on Sentinel-2 image data*
