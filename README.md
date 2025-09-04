@@ -1,6 +1,6 @@
 # Note
 
-This is a fork of ![sfinos316/Methane-Plume-Segmentation](https://github.com/sfinos316/Methane-Plume-Segmentation), made only remote : characters from file names, allowing cloning to a Windows machine.
+This is a fork of ![sfinos316/Methane-Plume-Segmentation](https://github.com/sfinos316/Methane-Plume-Segmentation), made only remove : characters from file names, allowing cloning to a Windows machine.
 
 # Methane-Plume-Segmentation
 
